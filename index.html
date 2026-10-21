@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vraxen Virtual Office — Kantor Virtual dengan Agen AI</title>
+<style>
+  /* ===== Design tokens ===== */
+  :root {
+    --ink: #0f172a;
+    --surface: #ffffff;
+    --surface-muted: #f8fafc;
+    --border: #e2e8f0;
+    --text-muted: #475569;
+    --accent: #0ea5e9;
+    --accent-hover: #0284c7;
+    --danger: #ef4444;
+    --radius: 8px;
+    --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    --max-width: 1100px;
+    --space-1: 0.5rem;
+    --space-2: 1rem;
+    --space-3: 1.5rem;
+    --space-4: 2rem;
+    --space-6: 3rem;
+    --space-8: 4rem;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    color: var(--ink);
+    background: var(--surface);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a { color: inherit; text-decoration: none; }
+  img { max-width: 100%; display: block; }
+
+  /* ===== Layout ===== */
+  .container {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 0 var(--space-2);
+  }
+
+  /* ===== Header ===== */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    border-bottom: 1px solid var(--border);
+    background: rgb(255 255 255 / 0.8);
+    backdrop-filter: blur(8px);
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+  }
+
+  .brand {
+    font-weight: 700;
+    font-size: 1.25rem;
+    letter-spacing: -0.02em;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .brand mark {
+    background: var(--accent);
+    color: #fff;
+    padding: 0.12em 0.4em;
+    border-radius: 4px;
+    font-size: 0.85em;
+  }
+
+  nav a {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    margin-left: var(--space-3);
+    padding: 0.4rem 0.6rem;
+    border-radius: var(--radius);
+    transition: background 0.2s, color 0.2s;
+  }
+
+  nav a:hover {
+    color: var(--ink);
+    background: var(--surface-muted);
+  }
+
+  .btn-primary {
+    background: var(--ink);
+    color: #fff;
+    padding: 0.6rem 1.25rem;
+    border-radius: var(--radius);
+    font-weight: 500;
+    font-size: 0.95rem;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-primary:hover {
+    background: #334155;
+  }
+
+  /* ===== Hero ===== */
+  .hero {
+    padding: var(--space-8) 0 var(--space-6);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-6);
+    align-items: center;
+  }
+
+  .hero h1 {
+    font-size: 3rem;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    margin-bottom: var(--space-3);
+    max-width: 48ch;
+  }
+
+  .hero p {
+    font-size: 1.125rem;
+    color: var(--text-muted);
+    max-width: 46ch;
+    margin-bottom: var(--space-4);
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+  }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--border);
+    padding: 0.6rem 1.25rem;
+    border-radius: var(--radius);
+    font-weight: 500;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: border 0.2s, background 0.2s;
+  }
+
+  .btn-ghost:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(14, 165, 233, 0.05);
+  }
+
+  .hero-visual {
+    background: var(--surface-muted);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: var(--space-4);
+    min-height: 420px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .visual-card {
+    padding: var(--space-3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: #fff;
+  }
+
+  .visual-card small {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+  }
+
+  .visual-card h3 {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .visual-card p {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+  }
+
+  /* ===== Section ===== */
+  section {
+    padding: var(--space-8) 0;
+  }
+
+  .section-head {
+    text-align: center;
+    max-width: 48ch;
+    margin: 0 auto var(--space-6);
+  }
+
+  .section-head h2 {
+    font-size: 2rem;
+    margin-bottom: var(--space-2);
+    letter-spacing: -0.02em;
+  }
+
+  .section-head p {
+    color: var(--text-muted);
+    font-size: 1.0625rem;
+  }
+
+  .badge {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    background: rgba(14, 165, 233, 0.08);
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    margin-bottom: var(--space-3);
+  }
+
+  /* ===== Grid / Cards ===== */
+  .grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-3);
+  }
+
+  @media (max-width: 900px) {
+    .grid-3 { grid-template-columns: 1fr; }
+    .hero-grid { grid-template-columns: 1fr; }
+    .hero h1 { font-size: 2.25rem; }
+  }
+
+  .card {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: var(--space-4);
+    background: #fff;
+  }
+
+  .card h3 {
+    font-size: 1.125rem;
+    margin-bottom: var(--space-2);
+  }
+
+  .card p {
+    font-size: 0.9375rem;
+    color: var(--text-muted);
+    margin-bottom: var(--space-3);
+  }
+
+  .card ul {
+    list-style: disc;
+    margin-left: 1.25rem;
+    color: var(--text-muted);
+    font-size: 0.9375rem;
+  }
+
+  .card ul li { margin-bottom: 0.5rem; }
+
+  /* ===== Stats ===== */
+  .stats {
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: var(--space-6) 0;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-4);
+    text-align: center;
+  }
+
+  @media (max-width: 900px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  .stat .value {
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.25rem;
+  }
+
+  .stat .label {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+  }
+
+  /* ===== Divisions ===== */
+  .divisions-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: var(--space-3);
+  }
+
+  .division {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: var(--space-3);
+    background: #fff;
+  }
+
+  .division strong {
+    display: block;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .division ul {
+    list-style: none;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+  }
+
+  .division ul li { margin-bottom: 0.35rem; }
+
+  /* ===== CTA ===== */
+  .cta {
+    background: var(--surface-muted);
+    border-radius: 16px;
+    padding: var(--space-8) var(--space-4);
+    text-align: center;
+  }
+
+  .cta h2 {
+    font-size: 1.75rem;
+    margin-bottom: var(--space-2);
+  }
+
+  .cta p {
+    color: var(--text-muted);
+    margin-bottom: var(--space-4);
+    max-width: 42ch;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* ===== Footer ===== */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: var(--space-6) 0;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+  }
+
+  .footer-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .footer-links a {
+    color: var(--text-muted);
+    margin-left: var(--space-3);
+  }
+
+  .footer-links a:hover { color: var(--ink); }
+
+  /* ===== Utility ===== */
+  .muted { color: var(--text-muted); }
+  .accent { color: var(--accent); }
+
+  /* ===== Focus states ===== */
+  a:focus-visible, button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container header-inner">
+    <div class="brand">Vraxen <mark>Virtual Office</mark></div>
+    <nav>
+      <a href="#divisi">Divisi</a>
+      <a href="#workflow">Alur Kerja</a>
+      <a href="#kontak">Kontak</a>
+    </nav>
+    <a href="#" class="btn-primary">Masuk ke Platform</a>
+  </div>
+</header>
+
+<main>
+
+<section class="hero">
+  <div class="container">
+    <div class="hero-grid">
+      <div>
+        <span class="badge">Platform Agen AI untuk Kantor Virtual</span>
+        <h1>Kantor Virtual yang Dikelola oleh Agen AI, bukan hanya software.</h1>
+        <p>Vraxen Virtual Office menghadirkan 25 agen AI terorganisir dalam 5 divisi aktif — dari Sekretariat Direksi, Kesehatan, Front Office, Billing &amp; Klaim, hingga Kepatuhan Data. Setiap agen siap menugaskan, melaporkan, dan menyinkronkan pekerjaan tim Anda.</p>
+        <div class="hero-actions">
+          <button class="btn-primary">Lihat Task Board</button>
+          <button class="btn-ghost">Hubungi Chief of Staff</button>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="visual-card">
+          <small>Status Platform</small>
+          <h3>25 Agen</h3>
+          <p>Total agen AI terdaftar di seluruh divisi.</p>
+        </div>
+        <div class="visual-card">
+          <small>Aktif Sekarang</small>
+          <h3>16 Bekerja</h3>
+          <p>Agen yang sedang menugaskan dan melaporkan pekerjaan.</p>
+        </div>
+        <div class="visual-card">
+          <small>Siap Tugas</small>
+          <h3>9 Standby</h3>
+          <p>Agen yang menunggu penugasan baru dari Direktur atau Chief of Staff.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="divisi">
+  <div class="container">
+    <div class="section-head">
+      <span class="badge">Struktur Organisasi</span>
+      <h2>Lima Divisi Aktif</h2>
+      <p>Setiap divisi dipimpin oleh PM dan didukung oleh agen AI spesialis sesuai fungsinya.</p>
+    </div>
+
+    <div class="divisions-list">
+      <div class="division">
+        <strong>Sekretariat Direksi</strong>
+        <ul>
+          <li>Raka Pratama — Chief of Staff</li>
+          <li>Budi Santoso — Finance</li>
+          <li>Dewi Anggraini — Auditor</li>
+        </ul>
+      </div>
+      <div class="division">
+        <strong>Kesehatan</strong>
+        <ul>
+          <li>Indah Lestari — PM Kesehatan</li>
+          <li>Bayu Saputra — Pelaporan Lapangan</li>
+        </ul>
+      </div>
+      <div class="division">
+        <strong>Front Office</strong>
+        <ul>
+          <li>Putri Wulandari — Front Office</li>
+        </ul>
+      </div>
+      <div class="division">
+        <strong>Billing &amp; Klaim</strong>
+        <ul>
+          <li>Arief Rahman — Billing &amp; Klaim</li>
+        </ul>
+      </div>
+      <div class="division">
+        <strong>Inventori &amp; Kepatuhan Data</strong>
+        <ul>
+          <li>Wahyu Nugroho — Inventori</li>
+          <li>Citra Dewi — Kepatuhan Data</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="workflow">
+  <div class="container">
+    <div class="section-head">
+      <span class="badge">Cara Kerja</span>
+      <h2>Alur Kerja Vraxen</h2>
+      <p>Direktur berkoordinasi dengan Chief of Staff, yang selanjutnya menyeberakkan tugas ke PM divisi terkait.</p>
+    </div>
+
+    <div class="grid-3">
+      <div class="card">
+        <h3>1. Direksi</h3>
+        <p>Hardy (Direktur Utama) menyampaikan arahan dan pekerjaan ke Chief of Staff secara langsung.</p>
+      </div>
+      <div class="card">
+        <h3>2. Chief of Staff</h3>
+        <p>Raka Pratama memilah pekerjaan, meneruskannya ke PM divisi yang relevan, dan mengantrekan laporan yang butuh persetujuan di halaman Approval.</p>
+      </div>
+      <div class="card">
+        <h3>3. PM Divisi</h3>
+        <p>Setiap PM menugaskan pekerjaan ke agen bawahannya, melaporkan progres, dan menyampaikan kendala jika ada.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="stats">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat">
+        <div class="value">25</div>
+        <div class="label">Total Agen AI</div>
+      </div>
+      <div class="stat">
+        <div class="value">16</div>
+        <div class="label">Sedang Bekerja</div>
+      </div>
+      <div class="stat">
+        <div class="value">9</div>
+        <div class="label">Standby</div>
+      </div>
+      <div class="stat">
+        <div class="value">5</div>
+        <div class="label">Divisi Aktif</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="kontak" class="cta">
+  <div class="container">
+    <h2>Siap Mengelola Tim Virtual Anda?</h2>
+    <p>Masuk ke platform Vraxen Virtual Office dan mulai koordinasi dengan Chief of Staff serta tim agen AI Anda.</p>
+    <a href="#" class="btn-primary">Kunjungi Platform</a>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="container footer-inner">
+    <div>Vraxen Virtual Office · Agentic AI Platform</div>
+    <div class="footer-links">
+      <a href="#divisi">Divisi</a>
+      <a href="#workflow">Alur Kerja</a>
+      <a href="#kontak">Kontak</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
